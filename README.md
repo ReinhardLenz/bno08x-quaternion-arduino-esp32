@@ -30,12 +30,7 @@ This repository documents my incremental approach: validate each building block 
 
 ## Images
 
-Place your images in the repository under `images/` and reference them like this:
 
-- Circuit: `images/circuit_image.png`  
-- Photo: `images/photo.jpg`
-
-Example:
 
 ![Circuit](images/circuit_image.png)
 ![Setup Photo](images/photo.jpg)
