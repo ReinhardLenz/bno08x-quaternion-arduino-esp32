@@ -1,20 +1,19 @@
 #include <Arduino.h>
 #include <Adafruit_BNO08x.h>
-#include <config.h>
 
+#define BNO08X_RESET -1
+#define RX2 15
+#define TX2 14
 
-constexpr char PROGRAM_NAME[] = "Stage 1A UART Diagnostic";
-constexpr char VERSION[]      = "0.1.0";
-constexpr char BUILD_DATE[]   = __DATE__;
-constexpr char BUILD_TIME[]   = __TIME__;
-
-Adafruit_BNO08x  bno08x(PIN_BNO_RESET);
+Adafruit_BNO08x  bno08x(BNO08X_RESET);
 sh2_SensorValue_t sensorValue;
+
+void setReports(void);
 
 void setup(void) {
   Serial.begin(115200);
-  Serial2.begin(115200, SERIAL_8N1, PIN_BNO_RX, PIN_BNO_TX);
-  while (!Serial) delay(10);     
+  Serial2.begin(3000000, SERIAL_8N1, RX2, TX2);
+  while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
   while (!Serial2) delay(10); 
 
   Serial.println("Adafruit BNO08x Accelerometer test!");
