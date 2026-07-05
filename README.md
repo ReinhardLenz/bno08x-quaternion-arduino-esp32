@@ -39,8 +39,7 @@ This repository documents my incremental approach: validate each building block 
 
 ## Shopping cart
 
-[Shopping cart](https://linktr.ee/@UARTBNO085)
-
+[Shopping cart](https://linktr.ee/UARTBNO085)
 
 ## Wiring / Circuit Documentation
 
