@@ -127,5 +127,8 @@ This project is open-source under the MIT License. See [LICENSE](LICENSE) for mo
 ## Acknowledgements
 
 * Bosch / Hillcrest Labs – BNO085
+* Wolles Elektronikkiste
+[Wolles Elektronikkiste](https://wolles-elektronikkiste.de/en/bno08x-9-dof-imus)
 
-chrom![Visitor Count](https://komarev.com/ghpvc/?username=ReinhardLenz&repo=bno08x-quaternion-arduino-esp32&color=green)
+
+![Visitor Count](https://komarev.com/ghpvc/?username=ReinhardLenz&repo=bno08x-quaternion-arduino-esp32&color=green)
