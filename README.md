@@ -1,7 +1,7 @@
 # bno08x-quaternion-arduino-esp32
 
 Step-by-step PlatformIO/Arduino project to connect a **Bosch BNO085 (BNO08x)** IMU to an **ESP32-CAM** and read orientation / motion data over **UART**.  
-This repository documents my incremental approach: validate each building block first (currently: **UART communication**) before moving to the final target hardware (**LilyGO T-Beam**).
+This repository documents my incremental approach: validate each building block first (currently: **UART communication**) before moving to the final target hardware (**LilyGO T-Beam**). The used environment is VS Code and Platform IO.
 
 ---
 
@@ -36,6 +36,11 @@ This repository documents my incremental approach: validate each building block 
 ![Setup Photo](images/photo.jpg)
 
 ---
+
+## Shopping cart
+
+[Shopping cart](https://linktr.ee/raikku130169lenz3)
+
 
 ## Wiring / Circuit Documentation
 
@@ -129,6 +134,7 @@ This project is open-source under the MIT License. See [LICENSE](LICENSE) for mo
 * Bosch / Hillcrest Labs – BNO085
 * Wolles Elektronikkiste
 [Wolles Elektronikkiste](https://wolles-elektronikkiste.de/en/bno08x-9-dof-imus)
+
 
 
 ![Visitor Count](https://komarev.com/ghpvc/?username=ReinhardLenz&repo=bno08x-quaternion-arduino-esp32&color=green)
