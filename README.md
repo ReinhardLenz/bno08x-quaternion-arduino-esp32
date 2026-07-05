@@ -47,13 +47,21 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
    - **Description**: A USB-to-UART bridge that allows for serial communication between a USB host and a UART device.  
    - **Pins**: VCC IO, GND, TXD, RXD, RTS, CTS  
 
+
+![CP2102](images/CP2102-USB.webp)
+
 2. **ESP32-CAM**  
    - **Description**: A microcontroller module with integrated Wi-Fi and Bluetooth, equipped with a camera interface.  
    - **Pins**: 5V, GND, OI12, OI13, IO15, IO14, IO2, IO1, 3V3, IO16, IO0, VCC, UOR, UOT, GND/R  
 
+![ESP32-CAM](images/ESP32-CAM-Pinout-1024x576.png)
+
+
 3. **BNO085 IMU Sensor**  
    - **Description**: An inertial measurement unit (IMU) sensor capable of providing orientation data.  
    - **Pins**: VCC, GND, SCL/SCK/RX, SDA/MISO/TX, ADR/MOSI, CS, INT, RST, PS1, PS0  
+![Setup Photo](images/GY-BNO085.webp)
+
 
 4. **Comment V2**  
    - **Description**: A placeholder component for comments or notes in the circuit design.  
@@ -101,4 +109,23 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
 - Press **RESET** **before programming** (right before/when upload starts if needed)
 - Press **RESET** **before opening / using Serial Monitor** (to ensure clean boot and output)
 
+
+## Serial monitor example print
+
+Accelerometer - x: 2.30 y: 2.22 z: 9.16
+
+Accelerometer - x: 2.30 y: 2.18 z: 9.16
+
 ---
+
+## License
+
+This project is open-source under the MIT License. See [LICENSE](LICENSE) for more information.
+
+---
+
+## Acknowledgements
+
+* Bosch / Hillcrest Labs – BNO085
+
+chrom![Visitor Count](https://komarev.com/ghpvc/?username=ReinhardLenz&repo=bno08x-quaternion-arduino-esp32&color=green)
