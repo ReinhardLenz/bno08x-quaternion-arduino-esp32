@@ -4,13 +4,15 @@
 #include "compass.h"
 
 #define BNO08X_RESET -1
+Adafruit_BNO08x bno08x(BNO08X_RESET);
+Compass compass(bno08x);
 
 constexpr char PROGRAM_NAME[] = "Stage 1A UART Diagnostic";
 constexpr char VERSION[]      = "0.1.0";
 constexpr char BUILD_DATE[]   = __DATE__;
 constexpr char BUILD_TIME[]   = __TIME__;
 
-Adafruit_BNO08x bno08x(BNO08X_RESET);
+
 
 enum class ErrorCode
 {
@@ -71,8 +73,7 @@ void setup(void)
 
     Serial.println("BNO08x Found!");
 
-    Compass::begin(bno08x);
-    Compass::setReports();
+    Compass::setReports(&bno08x, SH2_ROTATION_VECTOR, 100000);
 
     Serial.println("Reading events");
     delay(100);
@@ -80,5 +81,5 @@ void setup(void)
 
 void loop()
 {
-    Compass::update();
+    compass.update();
 }

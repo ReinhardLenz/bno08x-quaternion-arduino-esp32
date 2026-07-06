@@ -4,16 +4,35 @@
 #include <Arduino.h>
 #include <Adafruit_BNO08x.h>
 
-namespace Compass
+
+struct euler_t {
+  float yaw;
+  float pitch;
+  float roll;
+};
+class Compass
 {
-    // Initialize the compass module with an already-created BNO08x instance
-    void begin(Adafruit_BNO08x& imu);
+public:
+  explicit Compass(Adafruit_BNO08x& imu);
 
-    // Enable desired sensor reports (e.g., accelerometer)
-    void setReports();
+  void setReports();
+  void update();
+  static void setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval);
 
-    // Call repeatedly from loop(); handles reset + reading events
-    void update();
-}
+private:
+    euler_t ypr_1{};
 
-#endif // COMPASS_H
+    Adafruit_BNO08x& m_imu;
+    sh2_SensorValue_t sensorValue_1{};
+    sh2_SensorId_t reportType;
+    long reportIntervalUs;
+
+    bool update_sensor_1;
+
+    static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
+    static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
+    static void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr, bool degrees);
+    float getNorthDirection(float yaw);
+};
+
+#endif

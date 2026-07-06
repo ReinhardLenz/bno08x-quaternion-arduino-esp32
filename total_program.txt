@@ -1,6 +1,41 @@
-// Content from Compass.cpp
-#include "Compass.h"
-#include <math.h>
+// Content from compass.cpp
+#include "compass.h"
+
+Compass::Compass(Adafruit_BNO08x& imu)
+: m_imu(imu)
+{
+}
+/*
+void Compass::setReports()
+{
+    Serial.println("Setting desired reports");
+    if (!m_imu.enableReport(SH2_ACCELEROMETER))
+    {
+        Serial.println("Could not enable accelerometer vector");
+    }
+}
+
+
+void Compass::setReports()
+{
+  Serial.println("Setting desired reports");
+
+  // choose what you want enabled:
+  // Example: game rotation vector at 100ms
+  Compass::setReports(&m_imu, SH2_GAME_ROTATION_VECTOR, 100000); // microseconds
+
+  // or rotation vector:
+  // Compass::setReports(&m_imu, SH2_ROTATION_VECTOR, 100000);
+}
+*/
+
+void Compass::setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval)
+{
+  
+  if (!imu->enableReport(reportType, report_interval)) {
+    Serial.println("Could not enable report");
+  }
+}
 
 void Compass::quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees) {
 float sqr = qr * qr;
@@ -16,364 +51,191 @@ float sqk = qk * qk;
     ypr->yaw   *= RAD_TO_DEG;
     ypr->pitch *= RAD_TO_DEG;
     ypr->roll  *= RAD_TO_DEG;
+    Serial.print("Yaw: ");
+    Serial.print(ypr->yaw);
   }
+}
+
+void Compass::quaternionToEulerRV(sh2_RotationVectorWAcc_t* rv, euler_t* ypr, bool degrees) {
+  quaternionToEuler(rv->real, rv->i, rv->j, rv->k, ypr, degrees);
+}
+void Compass::quaternionToEulerGI(sh2_GyroIntegratedRV_t* gi, euler_t* ypr, bool degrees) {
+  quaternionToEuler(gi->real, gi->i, gi->j, gi->k, ypr, degrees);
 }
 
 float Compass::getNorthDirection(float yaw) {
   return (yaw < 0) ? (360.0f + yaw) : yaw;
 }
 
-float Compass::ConvertToShownDirection(float AbsDir, int degree_shift) {
-  return (float)((int(AbsDir) + degree_shift) % 360);
-}
 
-void Compass::quaternionToEulerRV(sh2_RotationVectorWAcc_t* rv, euler_t* ypr, bool degrees) {
-  quaternionToEuler(rv->real, rv->i, rv->j, rv->k, ypr, degrees);
-}
+void Compass::update()
+{
+    delay(10);
 
-void Compass::quaternionToEulerGI(sh2_GyroIntegratedRV_t* gi, euler_t* ypr, bool degrees) {
-  quaternionToEuler(gi->real, gi->i, gi->j, gi->k, ypr, degrees);
-}
+    if (m_imu.wasReset())
+    {
+        Serial.print("sensor was reset ");
+        setReports(&m_imu, SH2_ROTATION_VECTOR, 100000);
+    }
 
-void Compass::updateFromSensor(const sh2_SensorValue_t& value) {
-  sensorValue_1 = value;
-  update_sensor_1 = true;
-}
+    if (!m_imu.getSensorEvent(&sensorValue_1))
+    {
+        return;
+    }
 
-float Compass::getHeading(int degree_shift) {
-  if (update_sensor_1) {
-    // Choose conversion based on the actual arriving sensorId
-    switch (sensorValue_1.sensorId) {
-      case SH2_ROTATION_VECTOR:
-        quaternionToEulerRV(&sensorValue_1.un.rotationVector, &ypr_1, true);
-        break;
 
-      case SH2_GAME_ROTATION_VECTOR: {
+  switch (sensorValue_1.sensorId) {
+    
+    case SH2_ROTATION_VECTOR:
+    quaternionToEulerRV(&sensorValue_1.un.rotationVector, &ypr_1, true);
+    break;
+
+    case SH2_GAME_ROTATION_VECTOR: {
         // gameRotationVector has no accuracy field type; use raw components
         const auto& grv = sensorValue_1.un.gameRotationVector;
         quaternionToEuler(grv.real, grv.i, grv.j, grv.k, &ypr_1, true);
         break;
       }
 
-      case SH2_GYRO_INTEGRATED_RV:
+    case SH2_GYRO_INTEGRATED_RV:
         quaternionToEulerGI(&sensorValue_1.un.gyroIntegratedRV, &ypr_1, true);
         break;
 
-      default:
-        // leave ypr_1 unchanged
-        break;
-    }
-    update_sensor_1 = false;
-  }
+    default:
+      // leave ypr_1 unchanged
+    break;
 
-  float absDir   = getNorthDirection(ypr_1.yaw);
-  float shownDir = ConvertToShownDirection(absDir, degree_shift);
-  return shownDir;
+  }
+    float absDir   = getNorthDirection(ypr_1.yaw);
+//    Serial.println(absDir);
 }
 
-void Compass::setReports(BNO08x* imu, sh2_SensorId_t rptType, long report_interval) {
-  if (!imu->enableReport(rptType, report_interval)) {
-    Serial.println("Could not enable report on BNO08x");
-  }
-}
 
-// Content from Compass.h
+
+// Content from compass.h
 #ifndef COMPASS_H
 #define COMPASS_H
 
 #include <Arduino.h>
-#include <Wire.h>
-#include <sh2_SensorValue.h>
-#include <SparkFun_BNO08x_Arduino_Library.h>
+#include <Adafruit_BNO08x.h>
+
 
 struct euler_t {
   float yaw;
   float pitch;
   float roll;
 };
-
-class Compass {
+class Compass
+{
 public:
-  // Default to GAME_ROTATION_VECTOR because your setup enables it
-  Compass()
-  : update_sensor_1(false),
-    reportType(SH2_GAME_ROTATION_VECTOR),
-    reportIntervalUs(100000L) {}
+  explicit Compass(Adafruit_BNO08x& imu);
 
-  // Returns heading in degrees (0..360), with degree_shift applied
-  float getHeading(int degree_shift);
-  // Pass the raw event you read from imu.getSensorEvent()
-  void updateFromSensor(const sh2_SensorValue_t& value);
-
-  // 0..3 as provided by BNO08x status field
-  uint8_t getAccuracy() const { return sensorValue_1.status; }
-
-  long getReportInterval() const { return reportIntervalUs; }
-
-  // Helper to enable reports
-  static void setReports(BNO08x* bno08x, sh2_SensorId_t reportType, long report_interval);
+  void setReports();
+  void update();
+  static void setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval);
 
 private:
-  euler_t ypr_1{};
-  sh2_SensorValue_t sensorValue_1{};
-  bool update_sensor_1;
-  sh2_SensorId_t reportType;
-  long reportIntervalUs;
+    euler_t ypr_1{};
 
-  static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
-  static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
-  static void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr, bool degrees);
+    Adafruit_BNO08x& m_imu;
+    sh2_SensorValue_t sensorValue_1{};
+    sh2_SensorId_t reportType;
+    long reportIntervalUs;
 
-  float getNorthDirection(float yaw);
-  float ConvertToShownDirection(float AbsDir, int degree_shift);
+    bool update_sensor_1;
+
+    static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
+    static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
+    static void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr, bool degrees);
+    float getNorthDirection(float yaw);
 };
 
-#endif // COMPASS_H
-
-
-
-
+#endif
 
 // Content from main.cpp
 #include <Arduino.h>
-#include "Compass.h"
-#include <Wire.h>
-#include <SparkFun_BNO08x_Arduino_Library.h>
+#include <Adafruit_BNO08x.h>
+#include <config.h>
+#include "compass.h"
+
 #define BNO08X_RESET -1
-#define TIMEOUT_BOOT_BNO 100
-#define BNO08X_I2C_ADDRESS 0x4B
+Adafruit_BNO08x bno08x(BNO08X_RESET);
+Compass compass(bno08x);
 
-unsigned long millisOld;
-const unsigned long vibrationDurationMillis = 200UL;
-const unsigned long vibrationIntervalMillis = 1000UL;
-
-
-const int PIN_SDA = A4;   // works on many cores; otherwise set explicit pin numbers
-const int PIN_SCL = A5;
-
-static uint32_t lastGoodEventMs = 0;
-static uint32_t bootMs = 0;
-static uint32_t lastRecoverAttemptMs = 0;
-
-// Tune these:
-const uint32_t STARTUP_GRACE_MS = 3000;          // wait after setup before any recovery
-const uint32_t NO_EVENT_BEFORE_RECOVER_MS = 4000; // must be "dead" this long before recovery
-const uint32_t RECOVER_COOLDOWN_MS = 5000;        // minimum time between recovery attempts
-
-
-long lastSerialRecv = -10000L;
-float lastSerialHeading = 0.0f;
-const int alwaysOnButtonPin = 6;
-
-Compass compass;
-BNO08x imu;
+constexpr char PROGRAM_NAME[] = "Stage 1A UART Diagnostic";
+constexpr char VERSION[]      = "0.1.0";
+constexpr char BUILD_DATE[]   = __DATE__;
+constexpr char BUILD_TIME[]   = __TIME__;
 
 
 
-#define DBG_PRINTLN(x) do { if (Serial) Serial.println(x); } while(0)
-#define DBG_PRINT(x)   do { if (Serial) Serial.print(x); } while(0)
+enum class ErrorCode
+{
+    None,
+    UART,
+    BNO_NotFound,
+    EnableReport,
+    ProductID,
+};
 
+void fatalError(ErrorCode code)
+{
+    Serial.println();
+    Serial.println("========== FATAL ERROR ==========");
 
-void initBNO085() {
-  delay(1000);
+    switch (code)
+    {
+        case ErrorCode::UART:
+            Serial.println("Unable to communicate with BNO085.");
+            break;
 
-  // Re-start the IMU and re-enable the report
-  if (!imu.begin()) {
-    Serial.println("BNO08x re-init failed");
-    return;
-  }
-  Compass::setReports(&imu, SH2_GAME_ROTATION_VECTOR, compass.getReportInterval());
-  Serial.println("BNO08x re-init OK");
-}
+        case ErrorCode::BNO_NotFound:
+            Serial.println("BNO085 not detected.");
+            break;
 
-bool i2cBusClear() {
-  pinMode(PIN_SDA, INPUT_PULLUP);
-  pinMode(PIN_SCL, INPUT_PULLUP);
-  delayMicroseconds(5);
+        case ErrorCode::EnableReport:
+            Serial.println("Could not enable report.");
+            break;
 
-  // If SCL is stuck low, we can't clear it here
-  if (digitalRead(PIN_SCL) == LOW) return false;
-
-  // If SDA is stuck low, try to free it by clocking SCL
-  if (digitalRead(PIN_SDA) == LOW) {
-    pinMode(PIN_SCL, OUTPUT);
-    for (int i = 0; i < 9; i++) {
-      digitalWrite(PIN_SCL, HIGH);
-      delayMicroseconds(5);
-      digitalWrite(PIN_SCL, LOW);
-      delayMicroseconds(5);
+        default:
+            Serial.println("Unknown error.");
+            break;
     }
-    pinMode(PIN_SCL, INPUT_PULLUP);
-    delayMicroseconds(5);
-  }
 
-  // Generate a STOP: SDA low -> SCL high -> SDA high
-  pinMode(PIN_SDA, OUTPUT);
-  digitalWrite(PIN_SDA, LOW);
-  delayMicroseconds(5);
-
-  pinMode(PIN_SCL, INPUT_PULLUP);
-  delayMicroseconds(5);
-
-  pinMode(PIN_SDA, INPUT_PULLUP);
-  delayMicroseconds(5);
-
-  return (digitalRead(PIN_SDA) == HIGH);
-}
-
-void reinitWire() {
-  Wire.end();
-  delay(10);
-  Wire.begin();
-  Wire.setClock(10000);
-  Wire.setTimeout(50);
-}
-
-
-void waitForUser() {
-  Serial.begin(9600);
-
-  while (!Serial) {
-    ; // wait for Serial Monitor to open
-  }
-  DBG_PRINTLN("=== Waiting for user ===");
-  DBG_PRINT("Send any character to start setup");
-
-  while (!Serial.available()) {
-    ; // wait for user input
-  }
-
-  Serial.read(); // consume char
-  
-  DBG_PRINTLN("=== Starting setup ===");
-}
-
-
-void blinkCode(int n) {
-  for (int i = 0; i < n; i++) {
-//    digitalWrite(LED_BUILTIN, HIGH); delay(150);
-//    digitalWrite(LED_BUILTIN, LOW);  delay(150);
-  }
-  delay(600);
-}
-
-void setup() {
-
-  
-  analogReadResolution(10);      // match your math: 0..1023
-
-  //waitForUser();
-  delay(5000);  // give bootloader time to enumerate
-  blinkCode(1); // 1 blink = setup start
-  Serial.begin(9600);
-  blinkCode(2); // 1 blink = setup start
-
-  unsigned long t0 = millis();
-  bool serialReady = false;
-
-  while (millis() - t0 < 2000) {        // Wait max 2 sec
-    if (Serial) {
-      serialReady = true;
-      break;
+    while (true)
+    {
+        digitalWrite(PIN_STATUS_LED, HIGH);
+        delay(BLINK_DELAY);
+        digitalWrite(PIN_STATUS_LED, LOW);
+        delay(BLINK_DELAY);
     }
-    delay(10);
-  }
-
-  if (serialReady) {
-    Serial.println("Serial monitor connected!");
-  //  digitalWrite(LED_BUILTIN, HIGH);    // optional indicator
-  } else {
-    // Serial monitor not connected, continue anyway
-  }
-  
-
-  Wire.begin();
-  blinkCode(3); // 3 blinks = Wire started
-  Wire.setClock(10000);
-  delay(300);   // IMPORTANT: let BNO085 boot 
-
-  int retries = 0;
-  while (!imu.begin() && retries < 10) {
-    blinkCode(9); // IMU begin retry marker
-    delay(500);
-    retries++;
-  }
-  blinkCode(4);  // after imu.begin loop
-
-
-                
-  if (!imu.enableGameRotationVector(50)) {
-    blinkCode(7); // enable report failed
-  } else {
-    blinkCode(5); // enabled ok
-  }
-
-  
-  
-  blinkCode(6); // 6 blinks = setup done
-  DBG_PRINTLN("Setup complete");
-
-  bootMs = millis();
-  lastGoodEventMs = millis();        // start "alive"
-  lastRecoverAttemptMs = 0;
-
 }
 
-void loop() {
+void setup(void)
+{
+    Serial.begin(PC_BAUD);
+    Serial2.begin(BNO_BAUD, SERIAL_8N1, PIN_BNO_RX, PIN_BNO_TX);
 
-  // 2) Read degree shift first (potentiometer)
+    while (!Serial)  delay(RESET_TIME_MS);
+    while (!Serial2) delay(RESET_TIME_MS);
 
+    Serial.println("Adafruit BNO08x Accelerometer test!");
 
-  // 3) Get new IMU event & compute heading ONCE if there is a new event
-  static float lastHeading = NAN;
-  bool gotEvent = imu.getSensorEvent();
-
-  if (gotEvent) {
-    // Push the new event into Compass
-    compass.updateFromSensor(imu.sensorValue);
-
-
-    DBG_PRINTLN(lastHeading);
-    // Optional: print once per event
-    uint8_t acc = compass.getAccuracy();
-/*  
-    Serial.print("✅ Event sensorId=");
-    Serial.println(imu.sensorValue.sensorId);
-    Serial.print("Heading: ");
-    Serial.print(lastHeading);
-    Serial.print(" Accuracy: ");
-    Serial.println(acc);
-*/
-    lastGoodEventMs = millis();
-  } else {
-    // Optional 1s heartbeat
-    static uint32_t lastPrintMs = 0;
-    if (millis() - lastPrintMs > 1000) {
-      //Serial.println("No sensor event (not necessarily an error)");
-      lastPrintMs = millis();
+    if (!bno08x.begin_UART(&Serial2))
+    {
+        fatalError(ErrorCode::BNO_NotFound);
     }
-  }
 
-  // 4) Drive the belt using the last good heading every loop
-  if (!isnan(lastHeading)) {
+    Serial.println("BNO08x Found!");
 
-  }
+    compass.setReports();
 
-
-
-  bool deadTooLong  = (millis() - lastGoodEventMs) > NO_EVENT_BEFORE_RECOVER_MS;
-  bool cooldownOver = (lastRecoverAttemptMs == 0) ||
-                      ((millis() - lastRecoverAttemptMs) > RECOVER_COOLDOWN_MS);
-  if (deadTooLong && cooldownOver) {
-    lastRecoverAttemptMs = millis();
-   DBG_PRINTLN("⚠️ No events for too long -> attempting recovery");
-    i2cBusClear();
-    reinitWire();
-    delay(1000);
-    initBNO085(); // calls imu.begin() + setReports
-  }
-
-
+    Serial.println("Reading events");
+    delay(100);
 }
 
+void loop()
+{
+    compass.update();
+}
 
