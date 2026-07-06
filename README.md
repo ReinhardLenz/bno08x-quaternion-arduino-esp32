@@ -116,9 +116,18 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
 
 ## Serial monitor example print
 
-Accelerometer - x: 2.30 y: 2.22 z: 9.16
-
-Accelerometer - x: 2.30 y: 2.18 z: 9.16
+Adafruit BNO08x Accelerometer test!
+BNO08x Found!
+Reading events
+sensor was reset Yaw: 0.00
+Yaw: -141.18
+Yaw: -141.19
+Yaw: -141.14
+Yaw: -139.31
+Yaw: -139.32
+Yaw: -139.31
+Yaw: -139.30
+Yaw: -139.29
 
 ---
 
