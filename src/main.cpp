@@ -12,8 +12,6 @@ constexpr char VERSION[]      = "0.1.0";
 constexpr char BUILD_DATE[]   = __DATE__;
 constexpr char BUILD_TIME[]   = __TIME__;
 
-
-
 enum class ErrorCode
 {
     None,
@@ -82,4 +80,8 @@ void setup(void)
 void loop()
 {
     compass.update();
+
+    // Print yaw from main.cpp
+    Serial.print("Yaw: ");
+    Serial.println(compass.getYawDeg());
 }

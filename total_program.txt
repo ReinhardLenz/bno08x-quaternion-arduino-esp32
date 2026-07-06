@@ -228,7 +228,7 @@ void setup(void)
 
     Serial.println("BNO08x Found!");
 
-    compass.setReports();
+    Compass::setReports(&bno08x, SH2_ROTATION_VECTOR, 100000);
 
     Serial.println("Reading events");
     delay(100);
