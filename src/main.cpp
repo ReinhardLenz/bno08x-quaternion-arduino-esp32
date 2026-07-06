@@ -80,8 +80,8 @@ void setup(void)
 void loop()
 {
     compass.update();
+    Serial.print("Yaw  ");
+    Serial.println(compass.getYawNorthDeg());
 
-    // Print yaw from main.cpp
-    Serial.print("Yaw: ");
-    Serial.println(compass.getYawDeg());
+
 }

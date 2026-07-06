@@ -5,43 +5,20 @@ Compass::Compass(Adafruit_BNO08x& imu)
 : m_imu(imu)
 {
 }
-/*
-void Compass::setReports()
-{
-    Serial.println("Setting desired reports");
-    if (!m_imu.enableReport(SH2_ACCELEROMETER))
-    {
-        Serial.println("Could not enable accelerometer vector");
-    }
-}
-
-
-void Compass::setReports()
-{
-  Serial.println("Setting desired reports");
-
-  // choose what you want enabled:
-  // Example: game rotation vector at 100ms
-  Compass::setReports(&m_imu, SH2_GAME_ROTATION_VECTOR, 100000); // microseconds
-
-  // or rotation vector:
-  // Compass::setReports(&m_imu, SH2_ROTATION_VECTOR, 100000);
-}
-*/
 
 void Compass::setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval)
 {
-  
   if (!imu->enableReport(reportType, report_interval)) {
     Serial.println("Could not enable report");
   }
 }
 
-void Compass::quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees) {
-float sqr = qr * qr;
-float sqi = qi * qi;
-float sqj = qj * qj;
-float sqk = qk * qk;
+void Compass::quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees)
+{
+  float sqr = qr * qr;
+  float sqi = qi * qi;
+  float sqj = qj * qj;
+  float sqk = qk * qk;
 
   ypr->yaw   = atan2f(2.0f * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
   ypr->pitch = asinf(-2.0f * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
@@ -51,66 +28,61 @@ float sqk = qk * qk;
     ypr->yaw   *= RAD_TO_DEG;
     ypr->pitch *= RAD_TO_DEG;
     ypr->roll  *= RAD_TO_DEG;
-    Serial.print("Yaw: ");
-    Serial.print(ypr->yaw);
   }
 }
 
-void Compass::quaternionToEulerRV(sh2_RotationVectorWAcc_t* rv, euler_t* ypr, bool degrees) {
+void Compass::quaternionToEulerRV(sh2_RotationVectorWAcc_t* rv, euler_t* ypr, bool degrees)
+{
   quaternionToEuler(rv->real, rv->i, rv->j, rv->k, ypr, degrees);
 }
-void Compass::quaternionToEulerGI(sh2_GyroIntegratedRV_t* gi, euler_t* ypr, bool degrees) {
-  quaternionToEuler(gi->real, gi->i, gi->j, gi->k, ypr, degrees);
-}
 
-float Compass::getNorthDirection(float yaw) {
+
+
+
+
+float Compass::getNorthDirection(float yaw)
+{
   return (yaw < 0) ? (360.0f + yaw) : yaw;
 }
 
 
-void Compass::update()
+
+float Compass::getYawNorthDeg() const 
 {
-    delay(10);
-
-    if (m_imu.wasReset())
-    {
-        Serial.print("sensor was reset ");
-        setReports(&m_imu, SH2_ROTATION_VECTOR, 100000);
-    }
-
-    if (!m_imu.getSensorEvent(&sensorValue_1))
-    {
-        return;
-    }
-
-
-  switch (sensorValue_1.sensorId) {
-    
-    case SH2_ROTATION_VECTOR:
-    quaternionToEulerRV(&sensorValue_1.un.rotationVector, &ypr_1, true);
-    break;
-
-    case SH2_GAME_ROTATION_VECTOR: {
-        // gameRotationVector has no accuracy field type; use raw components
-        const auto& grv = sensorValue_1.un.gameRotationVector;
-        quaternionToEuler(grv.real, grv.i, grv.j, grv.k, &ypr_1, true);
-        break;
-      }
-
-    case SH2_GYRO_INTEGRATED_RV:
-        quaternionToEulerGI(&sensorValue_1.un.gyroIntegratedRV, &ypr_1, true);
-        break;
-
-    default:
-      // leave ypr_1 unchanged
-    break;
-
-  }
-    float absDir   = getNorthDirection(ypr_1.yaw);
-//    Serial.println(absDir);
+   return getNorthDirection(ypr_1.yaw); 
 }
 
 
+
+void Compass::update()
+{
+  delay(10);
+
+  if (m_imu.wasReset())
+  {
+    Serial.print("sensor was reset ");
+    setReports(&m_imu, SH2_ROTATION_VECTOR, 100000);
+  }
+
+  if (!m_imu.getSensorEvent(&sensorValue_1))
+  {
+    return;
+  }
+
+  switch (sensorValue_1.sensorId)
+  {
+    case SH2_ROTATION_VECTOR:
+      quaternionToEulerRV(&sensorValue_1.un.rotationVector, &ypr_1, true);
+      break;
+
+    default:
+      // ignore other reports
+      break;
+  }
+
+  // If you still want "absolute direction", keep this line; otherwise remove it.
+  (void)getNorthDirection(ypr_1.yaw);
+}
 
 // Content from compass.h
 #ifndef COMPASS_H
@@ -119,35 +91,36 @@ void Compass::update()
 #include <Arduino.h>
 #include <Adafruit_BNO08x.h>
 
-
 struct euler_t {
   float yaw;
   float pitch;
   float roll;
 };
+
 class Compass
 {
 public:
   explicit Compass(Adafruit_BNO08x& imu);
 
-  void setReports();
   void update();
+
+  // Keep this helper since you're using it from main.cpp
   static void setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval);
 
-private:
-    euler_t ypr_1{};
+  // Make yaw available to main.cpp (degrees)
+  float getYawDeg() const { return ypr_1.yaw; }
+  float getYawNorthDeg() const;
 
-    Adafruit_BNO08x& m_imu;
-    sh2_SensorValue_t sensorValue_1{};
-    sh2_SensorId_t reportType;
-    long reportIntervalUs;
+  private:
+euler_t ypr_1{};
 
-    bool update_sensor_1;
+  Adafruit_BNO08x& m_imu;
+  sh2_SensorValue_t sensorValue_1{};
 
-    static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
-    static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
-    static void quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, euler_t* ypr, bool degrees);
-    float getNorthDirection(float yaw);
+  static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
+  static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
+
+  float getNorthDirection(float yaw);
 };
 
 #endif
@@ -166,8 +139,6 @@ constexpr char PROGRAM_NAME[] = "Stage 1A UART Diagnostic";
 constexpr char VERSION[]      = "0.1.0";
 constexpr char BUILD_DATE[]   = __DATE__;
 constexpr char BUILD_TIME[]   = __TIME__;
-
-
 
 enum class ErrorCode
 {
@@ -237,5 +208,13 @@ void setup(void)
 void loop()
 {
     compass.update();
+
+    // Print yaw as "north direction" (0..360)
+    Serial.print("Yaw (North 0..360): ");
+    Serial.println(compass.getYawNorthDeg());
+
+    // Print yaw from main.cpp
+//    Serial.print("Yaw: ");
+//    Serial.println(compass.getYawDeg());
 }
 

@@ -22,9 +22,10 @@ public:
 
   // Make yaw available to main.cpp (degrees)
   float getYawDeg() const { return ypr_1.yaw; }
+  float getYawNorthDeg() const;
 
-private:
-  euler_t ypr_1{};
+  private:
+euler_t ypr_1{};
 
   Adafruit_BNO08x& m_imu;
   sh2_SensorValue_t sensorValue_1{};
@@ -32,7 +33,7 @@ private:
   static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
   static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
 
-  float getNorthDirection(float yaw);
+  static float getNorthDirection(float yaw);
 };
 
 #endif
