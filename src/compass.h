@@ -15,7 +15,7 @@ class Compass
 public:
   explicit Compass(Adafruit_BNO08x& imu);
 
-  void update();
+  void processSensor();
 
   // Keep this helper since you're using it from main.cpp
   static void setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval);

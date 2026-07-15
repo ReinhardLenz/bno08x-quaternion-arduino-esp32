@@ -53,7 +53,7 @@ float Compass::getYawNorthDeg() const
 
 
 
-void Compass::update()
+void Compass::processSensor()
 {
   delay(10);
 

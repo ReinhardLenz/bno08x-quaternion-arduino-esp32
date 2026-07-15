@@ -32,7 +32,7 @@ This repository documents my incremental approach: validate each building block 
 
 
 
-![Circuit](images/circuit_image.png)
+![Circuit](images/circuit_image_LED_ring.png)
 ![Setup Photo](images/photo.jpg)
 
 ---
@@ -67,38 +67,76 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
 ![Setup Photo](images/GY-BNO085.webp)
 
 
-4. **Comment V2**  
-   - **Description**: A placeholder component for comments or notes in the circuit design.  
-   - **Pins**: None  
+4. **NEOPIXEL WS2812 45 LED RING**  
+   * **Description**: A ring of 45 individually addressable RGB LEDs.  
+   * **Pins**: GND, D1, 5V, D0
 
-### Wiring Details
+5. **Electrolytic Capacitor**  
+   * **Description**: Used for power stabilization.  
+   * **Properties**: Capacitance: 1 µF  
+   * **Pins**: \-, \+  
 
-#### CP2102 USB-to-UART Bridge
+6. **Resistor**  
+   * **Description**: Used to limit current to the NeoPixel LED ring.  
+   * **Properties**: Resistance: 330 Ohms  
+   * **Pins**: pin1, pin2
 
-- **VCC IO** → **ESP32-CAM 5V**  
-- **GND** → **ESP32-CAM GND/R** and **BNO085 GND**  
-- **TXD** → **ESP32-CAM UOR**  
-- **RXD** → **ESP32-CAM UOT**
 
-#### ESP32-CAM
 
-- **5V** → **CP2102 VCC IO**  
-- **GND/R** → **CP2102 GND** and **BNO085 GND**  
-- **IO15** → **BNO085 SDA/MISO/TX**  
-- **IO14** → **BNO085 SCL/SCK/RX**  
-- **3V3** → **BNO085 VCC**  
-- **UOR** → **CP2102 TXD**  
-- **UOT** → **CP2102 RXD**  
-- **IO0** → **ESP32-CAM GND** (boot mode for flashing; see notes below)
+## **Wiring Details**
 
-#### BNO085 IMU Sensor
+### **CP2102 USB-to-UART Bridge**
 
-- **VCC** → **ESP32-CAM 3V3**  
-- **GND** → **ESP32-CAM GND/R** and **CP2102 GND**  
-- **SDA/MISO/TX** → **ESP32-CAM IO15**  
-- **SCL/SCK/RX** → **ESP32-CAM IO14**  
-- **PS0** → **ESP32-CAM GND/R**  
-- **PS1** → **ESP32-CAM 3V3**
+* **VCC IO**: Connected to the positive terminal of the Electrolytic Capacitor.  
+* **GND**: Connected to the common ground shared with ESP32-CAM, BNO085, Electrolytic Capacitor, and NeoPixel LED ring.  
+* **TXD**: Connected to UOR of the ESP32-CAM.  
+* **RXD**: Connected to UOT of the ESP32-CAM.
+
+### ---
+
+**ESP32-CAM**
+
+* **5V**: Connected to the positive terminal of the Electrolytic Capacitor and 5V of the NeoPixel LED ring.  
+* **GND/R**: Connected to the common ground shared with CP2102, BNO085, Electrolytic Capacitor, and NeoPixel LED ring.  
+* **IO15**: Connected to SDA/MISO/TX of the BNO085.  
+* **IO14**: Connected to SCL/SCK/RX of the BNO085.  
+* **UOR**: Connected to TXD of the CP2102.  
+* **UOT**: Connected to RXD of the CP2102.  
+* **OI13**: Connected to pin2 of the Resistor.  
+* **IO0**: Connected to GND of the ESP32-CAM.
+
+### ---
+
+**BNO085**
+
+* **VCC**: Connected to 3V3 of the ESP32-CAM.  
+* **GND**: Connected to the common ground shared with CP2102, ESP32-CAM, Electrolytic Capacitor, and NeoPixel LED ring.  
+* **SDA/MISO/TX**: Connected to IO15 of the ESP32-CAM.  
+* **SCL/SCK/RX**: Connected to IO14 of the ESP32-CAM.  
+* **PS0**: Connected to the common ground.  
+* **PS1**: Connected to 3V3 of the ESP32-CAM.
+
+### ---
+
+**NEOPIXEL WS2812 45 LED RING**
+
+* **5V**: Connected to the positive terminal of the Electrolytic Capacitor and 5V of the ESP32-CAM.  
+* **GND**: Connected to the common ground shared with CP2102, ESP32-CAM, BNO085, and Electrolytic Capacitor.  
+* **D1**: Connected to pin1 of the Resistor.
+
+### ---
+
+**Electrolytic Capacitor**
+
+* **\+**: Connected to VCC IO of the CP2102, 5V of the ESP32-CAM, and 5V of the NeoPixel LED ring.  
+* **\-**: Connected to the common ground shared with CP2102, ESP32-CAM, BNO085, and NeoPixel LED ring.
+
+### ---
+
+**Resistor**
+
+* **pin1**: Connected to D1 of the NeoPixel LED ring.  
+* **pin2**: Connected to OI13 of the ESP32-CAM.
 
 ---
 

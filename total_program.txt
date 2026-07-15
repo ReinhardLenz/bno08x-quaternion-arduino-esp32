@@ -21,13 +21,13 @@ void Compass::quaternionToEuler(float qr, float qi, float qj, float qk, euler_t*
   float sqk = qk * qk;
 
   ypr->yaw   = atan2f(2.0f * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
-  ypr->pitch = asinf(-2.0f * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
-  ypr->roll  = atan2f(2.0f * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+  //ypr->pitch = asinf(-2.0f * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
+  //ypr->roll  = atan2f(2.0f * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
 
   if (degrees) {
     ypr->yaw   *= RAD_TO_DEG;
-    ypr->pitch *= RAD_TO_DEG;
-    ypr->roll  *= RAD_TO_DEG;
+    //ypr->pitch *= RAD_TO_DEG;
+    //ypr->roll  *= RAD_TO_DEG;
   }
 }
 
@@ -80,8 +80,6 @@ void Compass::update()
       break;
   }
 
-  // If you still want "absolute direction", keep this line; otherwise remove it.
-  (void)getNorthDirection(ypr_1.yaw);
 }
 
 // Content from compass.h
@@ -120,7 +118,7 @@ euler_t ypr_1{};
   static void quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, euler_t* ypr, bool degrees);
   static void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t* ypr, bool degrees);
 
-  float getNorthDirection(float yaw);
+  static float getNorthDirection(float yaw);
 };
 
 #endif
@@ -208,13 +206,9 @@ void setup(void)
 void loop()
 {
     compass.update();
-
-    // Print yaw as "north direction" (0..360)
-    Serial.print("Yaw (North 0..360): ");
+    Serial.print("Yaw  ");
     Serial.println(compass.getYawNorthDeg());
 
-    // Print yaw from main.cpp
-//    Serial.print("Yaw: ");
-//    Serial.println(compass.getYawDeg());
+
 }
 

@@ -2,9 +2,18 @@
 #include <Adafruit_BNO08x.h>
 #include <config.h>
 #include "compass.h"
+#include <FastLED.h>
 
-#define BNO08X_RESET -1
-Adafruit_BNO08x bno08x(BNO08X_RESET);
+#define LED_PIN   15
+#define LED_COUNT 45
+CRGB leds[LED_COUNT];
+int led=0;
+float angle=0.0;
+
+constexpr gpio_num_t PIN_BNO_RESET = GPIO_NUM_13;
+
+Adafruit_BNO08x bno08x(PIN_BNO_RESET);
+
 Compass compass(bno08x);
 
 constexpr char PROGRAM_NAME[] = "Stage 1A UART Diagnostic";
@@ -60,8 +69,7 @@ void setup(void)
     Serial2.begin(BNO_BAUD, SERIAL_8N1, PIN_BNO_RX, PIN_BNO_TX);
 
     while (!Serial)  delay(RESET_TIME_MS);
-    while (!Serial2) delay(RESET_TIME_MS);
-
+    
     Serial.println("Adafruit BNO08x Accelerometer test!");
 
     if (!bno08x.begin_UART(&Serial2))
@@ -75,13 +83,22 @@ void setup(void)
 
     Serial.println("Reading events");
     delay(100);
+
+    FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, LED_COUNT);
+    FastLED.setBrightness(50);
+
 }
 
 void loop()
 {
-    compass.update();
+    compass.processSensor();
     Serial.print("Yaw  ");
-    Serial.println(compass.getYawNorthDeg());
+    angle=compass.getYawNorthDeg();
+    int led = (int)(angle * LED_COUNT / 360.0) % LED_COUNT;
+    fill_solid(leds, LED_COUNT, CRGB::Black);
+    leds[led] = CRGB::White;
+    FastLED.show();
+    Serial.println(angle);
 
 
 }
