@@ -33,7 +33,7 @@ This repository documents my incremental approach: validate each building block 
 
 
 ![Circuit](images/circuit_image_LED_ring.png)
-![Setup Photo](images/photo.jpg)
+![Setup Photo](images/bno085-quaternion-esp32-led-ring.jpg)
 
 ---
 
@@ -68,15 +68,22 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
 
 
 4. **NEOPIXEL WS2812 45 LED RING**  
-   * **Description**: A ring of 45 individually addressable RGB LEDs.  
+   * **Description**: A ring of 45 individually addressable RGB LEDs.  each LED in the ring has its own WS2812, which contains a small IC, which receives a serial data stream, extracts the 24bits for itself and forwards remaining bits to next LED. The address of an LED is it's order in the chain, bits are encoded by the high-time vs low-time of pulses as a single-wire, timing-based protocol (not UART). Data line: DOUT of LED n → DIN of LED n+1 
    * **Pins**: GND, D1, 5V, D0
+   * 45LED 120mm 102mm 9mm
+   * RGB Full Color Highlighting
 
-5. **Electrolytic Capacitor**  
+
+5. **Electrolytic Capacitor (optional)**  
    * **Description**: Used for power stabilization.  
    * **Properties**: Capacitance: 1 µF  
-   * **Pins**: \-, \+  
+   * **Pins**: \-, \+  (note:  stripe marking and for most through‑hole electrolytic capacitors, the shorter lead is the negative (−) lead.)
 
-6. **Resistor**  
+![CP2102](images/Polarity-wet-Al-Elcaps.jpg)
+
+
+
+6. **Resistor (optional)**  
    * **Description**: Used to limit current to the NeoPixel LED ring.  
    * **Properties**: Resistance: 330 Ohms  
    * **Pins**: pin1, pin2
