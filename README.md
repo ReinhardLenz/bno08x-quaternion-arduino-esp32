@@ -7,8 +7,8 @@ This repository documents my incremental approach: validate each building block 
 
 ## Status
 
-✅ First successful test runs completed (ESP32-CAM ↔ BNO085 via UART).  
-🚧 Work in progress: expanding sensor reports and moving toward quaternion/orientation use cases.
+✅ Successful test run with LED ring completed 
+🚧 Work in progress: move the LED handling from main to seperate implementation file before moving it to the BeaconBuddyFinder project.
 
 ---
 
