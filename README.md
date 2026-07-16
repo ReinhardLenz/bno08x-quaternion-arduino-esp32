@@ -38,7 +38,12 @@ This repository documents my incremental approach: validate each building block 
 ![Setup Photo](images/bno085-quaternion-esp32-led-ring.jpg)
 
 ---
+## Images
 
+
+[![Demo video](https://img.youtube.com/vi/rQA5oov4wD4/0.jpg)](https://www.youtube.com/watch?v=rQA5oov4wD4)
+
+---
 ## CAD circuit
 
 [Cirkit Designer project](https://app.cirkitdesigner.com/project/1237ee93-e452-48ec-8def-f4f1ca6864a7)
