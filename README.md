@@ -1,7 +1,7 @@
 # bno08x-quaternion-arduino-esp32
 
 Step-by-step PlatformIO/Arduino project to connect a **Bosch BNO085 (BNO08x)** IMU to an **ESP32-CAM** and read orientation / motion data over **UART**.  
-This repository documents my incremental approach: validate each building block first (currently: **UART communication**) before moving to the final target hardware (**LilyGO T-Beam**). The used environment is VS Code and Platform IO.
+This repository documents my incremental approach: validate each building block first (currently:  LED ring added to visualize the north direction). The used environment is VS Code and Platform IO.
 
 ---
 
@@ -17,6 +17,9 @@ This repository documents my incremental approach: validate each building block 
 - **ESP32-CAM**
 - **BNO085 / BNO08x IMU**
 - **CP2102 USB-to-UART** adapter (for flashing + serial monitor)
+- **Neopixel ring** 
+- **capacitor(option)** 
+- **Resistor(option)** 
 
 ---
 
@@ -29,7 +32,6 @@ This repository documents my incremental approach: validate each building block 
 ---
 
 ## Images
-
 
 
 ![Circuit](images/circuit_image_LED_ring.png)
@@ -110,7 +112,7 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
 * **UOR**: Connected to TXD of the CP2102.  
 * **UOT**: Connected to RXD of the CP2102.  
 * **OI13**: Connected to pin2 of the Resistor.  
-* **IO0**: Connected to GND of the ESP32-CAM.
+* **IO0**: Only during uploading of the program, IO0 is connected to GND of the ESP32-CAM.
 
 ### ---
 
@@ -154,7 +156,7 @@ This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a 
 2. Start upload from PlatformIO
 3. **After programming:** disconnect **GPIO0 from GND** (otherwise it will stay in bootloader mode)
 
-⚠️ **Reset button usage:**
+⚠️ **Reset button usage:** (note that the reset button is invisible "under" the chip, use a paperclip or any similar thin stick to push the button)
 - Press **RESET** **before programming** (right before/when upload starts if needed)
 - Press **RESET** **before opening / using Serial Monitor** (to ensure clean boot and output)
 
