@@ -39,6 +39,12 @@ This repository documents my incremental approach: validate each building block 
 
 ---
 
+## CAD circuit
+
+[Cirkit Designer project](https://app.cirkitdesigner.com/project/1237ee93-e452-48ec-8def-f4f1ca6864a7)
+
+---
+
 ## Shopping cart
 
 [Shopping cart](https://linktr.ee/UARTBNO085)
