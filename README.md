@@ -51,9 +51,9 @@ This circuit integrates an T-Beam module  and a BNO085 IMU sensor. The T-Beam  s
 
 ## Component List
 
-### **LILYGO T-Beam Meshtastic LORA32 915MHz**
+### **LILYGO T-Beam Meshtastic LORA32 868MHz**
 
-> * **Component Name:** LILYGO T-Beam Meshtastic LORA32 915MHz  
+> * **Component Name:** LILYGO T-Beam Meshtastic LORA32 868MHz  
 > * **Description:** A microcontroller board with integrated LoRa communication capabilities.  
 > * **Pins:** TX, RX, 23, 4, 0, GND, 3V3, SCL/22, SDA/21, 3.3V, LoRa2, 5V, 2, 13, 14, 25, 33, 32, 35, 15, RST, VN, VP
 
@@ -69,7 +69,7 @@ This circuit integrates an T-Beam module  and a BNO085 IMU sensor. The T-Beam  s
 
 ## **Wiring Details**
 
-### **LILYGO T-Beam Meshtastic LORA32 915MHz**
+### **LILYGO T-Beam Meshtastic LORA32 868MHz**
 
 > * **Pin 15** is connected to **BNO085 SDA/MISO/TX** for I2C data communication.  
 > * **Pin 14** is connected to **BNO085 SCL/SCK/RX** for I2C clock communication.  
