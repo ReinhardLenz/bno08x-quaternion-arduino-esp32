@@ -34,19 +34,15 @@ This repository documents my incremental approach: validate each building block 
 ## Images
 
 
-![Circuit](images/circuit_image_LED_ring.png)
-![Setup Photo](images/bno085-quaternion-esp32-led-ring.jpg)
+![Circuit](images/circuit_image_T-BEAM_BNO085.png)
+![Setup Photo](images/T-Beam+BNO085.jpg)
 
 ---
-## Images
-
-
-[![Demo video](https://img.youtube.com/vi/rQA5oov4wD4/0.jpg)](https://www.youtube.com/watch?v=rQA5oov4wD4)
 
 ---
 ## CAD circuit
 
-[Cirkit Designer project](https://app.cirkitdesigner.com/project/1237ee93-e452-48ec-8def-f4f1ca6864a7)
+[Cirkit Designer project](https://app.cirkitdesigner.com/project/7dc46603-23f3-4723-bd57-30f7109c99e6)
 
 ---
 
@@ -56,121 +52,45 @@ This repository documents my incremental approach: validate each building block 
 
 ## Wiring / Circuit Documentation
 
-This circuit integrates an ESP32-CAM module, a CP2102 USB-to-UART bridge, and a BNO085 IMU sensor. The ESP32-CAM serves as the main microcontroller, interfacing with the BNO085 sensor to read orientation data. The CP2102 module is used for serial communication with a host computer, facilitating programming and debugging of the ESP32-CAM.
+This circuit integrates an T-Beam module  and a BNO085 IMU sensor. The T-Beam  serves as the main microcontroller, interfacing with the BNO085 sensor to read orientation data. 
 
-### Component List
+## Component List
 
-1. **CP2102 USB-to-UART Bridge**  
-   - **Description**: A USB-to-UART bridge that allows for serial communication between a USB host and a UART device.  
-   - **Pins**: VCC IO, GND, TXD, RXD, RTS, CTS  
+### **LILYGO T-Beam Meshtastic LORA32 915MHz**
 
-
-![CP2102](images/CP2102-USB.webp)
-
-2. **ESP32-CAM**  
-   - **Description**: A microcontroller module with integrated Wi-Fi and Bluetooth, equipped with a camera interface.  
-   - **Pins**: 5V, GND, OI12, OI13, IO15, IO14, IO2, IO1, 3V3, IO16, IO0, VCC, UOR, UOT, GND/R  
-
-![ESP32-CAM](images/ESP32-CAM-Pinout-1024x576.png)
+> * **Component Name:** LILYGO T-Beam Meshtastic LORA32 915MHz  
+> * **Description:** A microcontroller board with integrated LoRa communication capabilities.  
+> * **Pins:** TX, RX, 23, 4, 0, GND, 3V3, SCL/22, SDA/21, 3.3V, LoRa2, 5V, 2, 13, 14, 25, 33, 32, 35, 15, RST, VN, VP
 
 
-3. **BNO085 IMU Sensor**  
-   - **Description**: An inertial measurement unit (IMU) sensor capable of providing orientation data.  
-   - **Pins**: VCC, GND, SCL/SCK/RX, SDA/MISO/TX, ADR/MOSI, CS, INT, RST, PS1, PS0  
+### **BNO085**
+
+> * **Component Name:** BNO085  
+> * **Description:** An advanced sensor module providing orientation and motion data.  
+> * **Pins:** VCC, GND, SCL/SCK/RX, SDA/MISO/TX, ADR/MOSI, CS, INT, RST, PS1, PS0 
+
 ![Setup Photo](images/GY-BNO085.webp)
-
-
-4. **NEOPIXEL WS2812 45 LED RING**  
-   * **Description**: A ring of 45 individually addressable RGB LEDs.  each LED in the ring has its own WS2812, which contains a small IC, which receives a serial data stream, extracts the 24bits for itself and forwards remaining bits to next LED. The address of an LED is it's order in the chain, bits are encoded by the high-time vs low-time of pulses as a single-wire, timing-based protocol (not UART). Data line: DOUT of LED n → DIN of LED n+1 
-   * **Pins**: GND, D1, 5V, D0
-   * 45LED 120mm 102mm 9mm
-   * RGB Full Color Highlighting
-
-
-5. **Electrolytic Capacitor (optional)**  
-   * **Description**: Used for power stabilization.  
-   * **Properties**: Capacitance: 1 µF  
-   * **Pins**: \-, \+  (note:  stripe marking and for most through‑hole electrolytic capacitors, the shorter lead is the negative (−) lead.)
-
-![CP2102](images/Polarity-wet-Al-Elcaps.jpg)
-
-
-
-6. **Resistor (optional)**  
-   * **Description**: Used to limit current to the NeoPixel LED ring.  
-   * **Properties**: Resistance: 330 Ohms  
-   * **Pins**: pin1, pin2
-
 
 
 ## **Wiring Details**
 
-### **CP2102 USB-to-UART Bridge**
+### **LILYGO T-Beam Meshtastic LORA32 915MHz**
 
-* **VCC IO**: Connected to the positive terminal of the Electrolytic Capacitor.  
-* **GND**: Connected to the common ground shared with ESP32-CAM, BNO085, Electrolytic Capacitor, and NeoPixel LED ring.  
-* **TXD**: Connected to UOR of the ESP32-CAM.  
-* **RXD**: Connected to UOT of the ESP32-CAM.
+> * **Pin 15** is connected to **BNO085 SDA/MISO/TX** for I2C data communication.  
+> * **Pin 14** is connected to **BNO085 SCL/SCK/RX** for I2C clock communication.  
+> * **Pin 3V3** is connected to **BNO085 VCC** and **PS1** to provide power.  
+> * **Pin GND** is connected to **BNO085 GND** and **PS0** to complete the power circuit.
 
-### ---
+### **BNO085**
 
-**ESP32-CAM**
-
-* **5V**: Connected to the positive terminal of the Electrolytic Capacitor and 5V of the NeoPixel LED ring.  
-* **GND/R**: Connected to the common ground shared with CP2102, BNO085, Electrolytic Capacitor, and NeoPixel LED ring.  
-* **IO15**: Connected to SDA/MISO/TX of the BNO085.  
-* **IO14**: Connected to SCL/SCK/RX of the BNO085.  
-* **UOR**: Connected to TXD of the CP2102.  
-* **UOT**: Connected to RXD of the CP2102.  
-* **OI13**: Connected to pin2 of the Resistor.  
-* **IO0**: Only during uploading of the program, IO0 is connected to GND of the ESP32-CAM.
-
-### ---
-
-**BNO085**
-
-* **VCC**: Connected to 3V3 of the ESP32-CAM.  
-* **GND**: Connected to the common ground shared with CP2102, ESP32-CAM, Electrolytic Capacitor, and NeoPixel LED ring.  
-* **SDA/MISO/TX**: Connected to IO15 of the ESP32-CAM.  
-* **SCL/SCK/RX**: Connected to IO14 of the ESP32-CAM.  
-* **PS0**: Connected to the common ground.  
-* **PS1**: Connected to 3V3 of the ESP32-CAM.
-
-### ---
-
-**NEOPIXEL WS2812 45 LED RING**
-
-* **5V**: Connected to the positive terminal of the Electrolytic Capacitor and 5V of the ESP32-CAM.  
-* **GND**: Connected to the common ground shared with CP2102, ESP32-CAM, BNO085, and Electrolytic Capacitor.  
-* **D1**: Connected to pin1 of the Resistor.
-
-### ---
-
-**Electrolytic Capacitor**
-
-* **\+**: Connected to VCC IO of the CP2102, 5V of the ESP32-CAM, and 5V of the NeoPixel LED ring.  
-* **\-**: Connected to the common ground shared with CP2102, ESP32-CAM, BNO085, and NeoPixel LED ring.
-
-### ---
-
-**Resistor**
-
-* **pin1**: Connected to D1 of the NeoPixel LED ring.  
-* **pin2**: Connected to OI13 of the ESP32-CAM.
+> * **SDA/MISO/TX** is connected to **LILYGO T-Beam Pin 15** for I2C data communication.  
+> * **SCL/SCK/RX** is connected to **LILYGO T-Beam Pin 14** for I2C clock communication.  
+> * **VCC** is connected to **LILYGO T-Beam Pin 3V3** to receive power.  
+> * **GND** is connected to **LILYGO T-Beam Pin GND** to complete the power circuit.  
+> * **PS1** is connected to **VCC** for power configuration.  
+> * **PS0** is connected to **GND** for power configuration.
 
 ---
-
-## Flashing ESP32-CAM with CP2102 (Important)
-
-⚠️ **ESP32-CAM boot mode requirement (GPIO0):**
-1. **Before programming:** connect **GPIO0 → GND**
-2. Start upload from PlatformIO
-3. **After programming:** disconnect **GPIO0 from GND** (otherwise it will stay in bootloader mode)
-
-⚠️ **Reset button usage:** (note that the reset button is invisible "under" the chip, use a paperclip or any similar thin stick to push the button)
-- Press **RESET** **before programming** (right before/when upload starts if needed)
-- Press **RESET** **before opening / using Serial Monitor** (to ensure clean boot and output)
-
 
 ## Serial monitor example print
 

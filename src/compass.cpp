@@ -7,7 +7,8 @@ Compass::Compass(Adafruit_BNO08x& imu)
 
 void Compass::setReports(Adafruit_BNO08x* imu, sh2_SensorId_t reportType, long report_interval)
 {
-  if (!imu->enableReport(reportType, report_interval)) {
+  if (!imu->enableReport(reportType, report_interval))
+  {
     Serial.println("Could not enable report");
   }
 }
@@ -20,13 +21,16 @@ void Compass::quaternionToEuler(float qr, float qi, float qj, float qk, euler_t*
   float sqk = qk * qk;
 
   ypr->yaw   = atan2f(2.0f * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
-  //ypr->pitch = asinf(-2.0f * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
-  //ypr->roll  = atan2f(2.0f * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+  ypr->pitch = asinf(-2.0f * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
+  ypr->roll  = atan2f(2.0f * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
 
-  if (degrees) {
+  if (degrees)
+  {
     ypr->yaw   *= RAD_TO_DEG;
-    //ypr->pitch *= RAD_TO_DEG;
-    //ypr->roll  *= RAD_TO_DEG;
+    ypr->pitch *= RAD_TO_DEG;
+    ypr->roll  *= RAD_TO_DEG;
+
+    Serial.printf("X: %.2f, Y: %.2f, Z: %.2f\n", ypr->pitch, ypr->yaw, ypr->roll);
   }
 }
 
@@ -35,23 +39,15 @@ void Compass::quaternionToEulerRV(sh2_RotationVectorWAcc_t* rv, euler_t* ypr, bo
   quaternionToEuler(rv->real, rv->i, rv->j, rv->k, ypr, degrees);
 }
 
-
-
-
-
 float Compass::getNorthDirection(float yaw)
 {
   return (yaw < 0) ? (360.0f + yaw) : yaw;
 }
 
-
-
-float Compass::getYawNorthDeg() const 
+float Compass::getYawNorthDeg() const
 {
-   return getNorthDirection(ypr_1.yaw); 
+  return getNorthDirection(ypr_1.yaw);
 }
-
-
 
 void Compass::processSensor()
 {
@@ -75,8 +71,6 @@ void Compass::processSensor()
       break;
 
     default:
-      // ignore other reports
       break;
   }
-
 }
