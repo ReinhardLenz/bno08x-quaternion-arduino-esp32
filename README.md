@@ -1,26 +1,21 @@
 # bno08x-quaternion-arduino-esp32
 
-Step-by-step PlatformIO/Arduino project to connect a **Bosch BNO085 (BNO08x)** IMU to an **ESP32-CAM** and read orientation / motion data over **UART**.  
-This repository documents my incremental approach: validate each building block first (currently:  LED ring added to visualize the north direction). The used environment is VS Code and Platform IO.
+Step-by-step PlatformIO/Arduino project to connect a **Bosch BNO085 (BNO08x)** IMU to an **T-Beam** and read orientation / motion data over **UART**.  
+This repository documents my incremental approach: validate each building block first (currently:  exchange ESP32-CAM with T-Beam). The used environment is VS Code and Platform IO.
 
 ---
 
 ## Status
 
-✅ Successful test run with LED ring completed 
-🚧 Work in progress: move the LED handling from main to seperate implementation file before moving it to the BeaconBuddyFinder project.
-
+✅ Successful test run with ESP32-CAM
+🚧 Work in progress: exchange the EPS32-CAM with T-Beam.
+Next step: add the LED-ring 
 ---
 
 ## Hardware
 
-- **ESP32-CAM**
+- **T-Beam**
 - **BNO085 / BNO08x IMU**
-- **CP2102 USB-to-UART** adapter (for flashing + serial monitor)
-- **Neopixel ring** 
-- **capacitor(option)** 
-- **Resistor(option)** 
-
 ---
 
 ## Development Environment
