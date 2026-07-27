@@ -3,13 +3,13 @@
 
 #include <config.h>
 #include "compass.h"
-//#include "LED.h"
+#include "LED.h"
 
 Adafruit_BNO08x bno08x(PIN_BNO_RESET);
 Compass compass(bno08x);
 
 // LED ring module
-//LedRing ledRing(LED_COUNT, static_cast<uint8_t>(PIN_LED_RING));
+LedRing ledRing(LED_COUNT, static_cast<uint8_t>(PIN_LED_RING));
 
 enum class ErrorCode
 {
@@ -76,7 +76,7 @@ void setup()
   Serial.println("Reading events");
   delay(100);
 
-  //ledRing.begin(LED_BRIGHTNESS);
+  ledRing.begin(LED_BRIGHTNESS);
 }
 
 void loop()
@@ -88,5 +88,5 @@ void loop()
   Serial.print("Yaw North: ");
   Serial.println(yawNorth);
 
-  //ledRing.showDirection(yawNorth, CRGB::White);
+  ledRing.showDirection(yawNorth, CRGB::White);
 }
