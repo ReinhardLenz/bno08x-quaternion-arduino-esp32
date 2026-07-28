@@ -31,9 +31,11 @@ Next step: add the LED-ring
 
 
 ![Circuit](images/T-Beam-BNO085-MP3608-Neopixel.png)
-![Setup Photo](images/T-Beam+BNO085.jpg)
 
 ---
+# demo video link
+
+[![Demo video](https://img.youtube.com/vi/GA_pXpRQkuE/0.jpg)](https://www.youtube.com/watch?v=GA_pXpRQkuE)
 
 ---
 ## CAD circuit
